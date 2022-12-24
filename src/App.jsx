@@ -1,14 +1,10 @@
-
-
 import { useState } from 'react'
 
 import { HomePage } from './components/Home.page'
 import { RQSuperHeroesPage } from './components/RQSuperHeroes.page'
 import { SuperHeroesPage } from './components/SuperHeroes.page'
 
-import reactLogo from './assets/react.svg'
-
-import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 
 import './App.css'
 
@@ -34,21 +30,12 @@ function App() {
             </ul>
           </nav>
 
-          
-
+          <Routes>
+            <Route exact path='/super-heroes' element={<SuperHeroesPage/>}/>
+            <Route exact path='/rq-super-heroes' element={<RQSuperHeroesPage/>}/>
+            <Route exact path='/' element={<HomePage/>}/>
+          </Routes>
         </div>
-
-
-
-
-
-
-
-
-        <p className="read-the-docs">
-          Click on the Vite and React logos to learn more
-        </p>
-
       </div>
 
     </Router>
