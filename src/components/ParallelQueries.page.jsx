@@ -26,7 +26,7 @@ export const ParallelQueriesPage = () => {
                 <h3>Friends: </h3>
                 {friends?.data.map(
                     friend => (
-                        <div>{friend.name}</div>
+                        <div key={friend.id}>{friend.name}</div>
                     )
                 )}
             </div>
@@ -37,7 +37,7 @@ export const ParallelQueriesPage = () => {
                 <h3>Super Heroes: </h3>
                 {superheroes?.data.map(
                     hero => (
-                        <div>{hero.name}</div>
+                        <div key={hero.id}>{hero.name}</div>
                     )
                 )}
             </div>
