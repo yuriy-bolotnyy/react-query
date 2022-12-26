@@ -40,18 +40,51 @@ export const useSuperHeroesData = (onSuccess, onError) => {
 // }
 
 // In this example, we re-use data from POST request's response, so we do save one network request, which would happen after invalidation, see ^^^
+// export const addSuperHeroesData = () => {
+//     const queryClient = useQueryClient()
+//     return useMutation(addSuperHero, {
+//         onSuccess: (data) => {
+//             console.log(`useMutation OnSuccess => data: `, data)
+//             // queryClient.invalidateQueries('super-heroes')   // Invalidate query, so it will automatically re-fetch, when new superhero added
+//             queryClient.setQueryData('super-heroes', (oldQueryData) => {
+//                 return {
+//                     ...oldQueryData,
+//                     data: [...oldQueryData.data, data.data],
+//                 }
+//             })
+//         }
+//             })
+// }
+
+// In this example we use optimistic updates i.e. we add new hero right away, then re-fetch it in background
 export const addSuperHeroesData = () => {
     const queryClient = useQueryClient()
     return useMutation(addSuperHero, {
-        onSuccess: (data) => {
-            console.log(`useMutation OnSuccess => data: `, data)
-            // queryClient.invalidateQueries('super-heroes')   // Invalidate query, so it will automatically re-fetch, when new superhero added
+        onMutate: async (newHero) => {
+            await queryClient.cancelQueries('super-heroes')
+            const previousHeroData = queryClient.getQueryData('super-heroes')
+            
             queryClient.setQueryData('super-heroes', (oldQueryData) => {
                 return {
                     ...oldQueryData,
-                    data: [...oldQueryData.data, data.data],
+                    data: [
+                        ...oldQueryData.data, 
+                        { id: oldQueryData?.data?.length + 1, ...newHero},
+                    ],
                 }
             })
-        }
-            })
+
+            return {
+                previousHeroData,
+            }
+        },
+
+        onError: (_error, _hero, context) => {
+            queryClient.setQueryData('super-heroes', context.previousHeroData)
+        },
+
+        onSettled: () => {
+            queryClient.invalidateQueries('super-heroes')
+        },
+    })
 }
