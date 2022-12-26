@@ -1,4 +1,4 @@
-import { useQuery, useMutation } from "react-query"
+import { useQuery, useMutation, useQueryClient } from "react-query"
 
 import axios from 'axios'
 
@@ -29,5 +29,10 @@ export const useSuperHeroesData = (onSuccess, onError) => {
 }
 
 export const addSuperHeroesData = () => {
-    return useMutation(addSuperHero)
+    const queryClient = useQueryClient()
+    return useMutation(addSuperHero, {
+        onSuccess: () => {
+            queryClient.invalidateQueries('super-heroes')   // Invalidate query, so it will automatically re-fetch, when new superhero added
+        }
+    })
 }
