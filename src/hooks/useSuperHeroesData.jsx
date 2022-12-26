@@ -7,7 +7,7 @@ const fetchSuperHeroes = () => {
 }
 
 const addSuperHero = (hero) => {
-    axios.post('http://localhost:3000/superheroes', hero)
+    return axios.post('http://localhost:3000/superheroes', hero)
 }
 
 export const useSuperHeroesData = (onSuccess, onError) => {
@@ -28,11 +28,30 @@ export const useSuperHeroesData = (onSuccess, onError) => {
     )
 }
 
+// This example invaidates query right after adding a new superhero, so the screen refreshes automatically 
+// export const addSuperHeroesData = () => {
+//     const queryClient = useQueryClient()
+//     return useMutation(addSuperHero, {
+//         onSuccess: (data) => {
+//             console.log(`useMutation OnSuccess => data: `, data)
+//             queryClient.invalidateQueries('super-heroes')   // Invalidate query, so it will automatically re-fetch, when new superhero added
+//         }
+//             })
+// }
+
+// In this example, we re-use data from POST request's response, so we do save one network request, which would happen after invalidation, see ^^^
 export const addSuperHeroesData = () => {
     const queryClient = useQueryClient()
     return useMutation(addSuperHero, {
-        onSuccess: () => {
-            queryClient.invalidateQueries('super-heroes')   // Invalidate query, so it will automatically re-fetch, when new superhero added
+        onSuccess: (data) => {
+            console.log(`useMutation OnSuccess => data: `, data)
+            // queryClient.invalidateQueries('super-heroes')   // Invalidate query, so it will automatically re-fetch, when new superhero added
+            queryClient.setQueryData('super-heroes', (oldQueryData) => {
+                return {
+                    ...oldQueryData,
+                    data: [...oldQueryData.data, data.data],
+                }
+            })
         }
-    })
+            })
 }
